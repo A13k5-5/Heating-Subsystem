@@ -8,7 +8,7 @@ double r1, temp;
 
 // Writing const
 int transistorBase = 2;
-double targetTemp = 30;
+double targetTemp = 25;
 
 double celsToKelvin(double cels) {
   return cels + 273.15;
@@ -18,13 +18,13 @@ double kelvinToCels(double kelv){
   return kelv - 273.15;
 }
 
-// void controlTemp(double curTemp, double targetTemp){
-//   if (curTemp < targetTemp){
-//     digitalWrite(transistorBase, HIGH);
-//   } else {
-//     digitalWrite(transistorBase, Low);
-//   }
-// }
+void controlTemp(double curTemp, double targetTemp){
+  if (curTemp < targetTemp){
+    digitalWrite(transistorBase, LOW);
+  } else {
+    digitalWrite(transistorBase, LOW);
+  }
+}
 
 void setup() {
   Serial.begin(9600);
@@ -39,14 +39,6 @@ void loop() {
   Serial.println(temp);
 
   // Writing
-  if (temp < targetTemp){
-    digitalWrite(transistorBase, HIGH);
-  } else {
-    digitalWrite(transistorBase, LOW);
-  }
+  controlTemp(temp, targetTemp);
   delay(100);
-  // delay(1000);
-  // digitalWrite(transistorBase, LOW);
-  // delay(1000);
-  // delay(100);
 }
