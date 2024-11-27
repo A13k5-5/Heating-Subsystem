@@ -8,8 +8,8 @@ double r1, temp;
 double tempUncertainty = 0.6;
 
 // Writing const
-int transistorBase = 2;
-double targetTemp = 28;
+int transistorBase = 11;
+double targetTemp = 24;
 
 double celsToKelvin(double cels) {
   return cels + 273.15;
@@ -21,7 +21,7 @@ double kelvinToCels(double kelv){
 
 void controlTemp(double curTemp, double targetTemp){
   if (curTemp < targetTemp){
-    digitalWrite(transistorBase, LOW);
+    digitalWrite(transistorBase, HIGH);
     Serial.println("Heating up");
   } else {
     digitalWrite(transistorBase, LOW);
@@ -43,5 +43,6 @@ void loop() {
 
   // Writing
   controlTemp(temp, targetTemp);
+
   delay(1500);
 }
