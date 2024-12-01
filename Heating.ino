@@ -1,17 +1,27 @@
 // Reading const
 #define SLAVE_ADDR 9
 #include <Wire.h>
+#include <PID_v1.h>
+
+double targetTemp = 29;
+double Input;
+double Output;
+// PID parameters
+double Kp = 0, Ki = 10, Kd = 0;
+
+// Create PID instance 
+PID = myPID(&Input, &Output, &targetTemp, Kp, Ki, Kd, DIRECT);
+
+
 int analogPin = A3;
 double val = 0.0; // store the read value
 double constRes = 6660.0;
 double totalVolt = 5.0;
 double b = 4220;
 double r1, temp;
-double tempUncertainty = 0.6;
 
 // Writing const
 int transistorBase = 3;
-double targetTemp = 29;
 
 double celsToKelvin(double cels) {
   return cels + 273.15;
@@ -21,13 +31,19 @@ double kelvinToCels(double kelv){
   return kelv - 273.15;
 }
 
+void heater(bool on){
+  digitalWrite(transistorBase, on ? HIGH : LOW);
+}
+
 void controlTemp(double curTemp, double targetTemp){
   if (curTemp < targetTemp - 0.5){
-    digitalWrite(transistorBase, HIGH);
+    // digitalWrite(transistorBase, HIGH);
+    heater(true);
     Serial.println("Heating up");
     Wire.write("Heating up");
   } else {
-    digitalWrite(transistorBase, LOW);
+    // digitalWrite(transistorBase, LOW);
+    heater(false);
     Serial.println("Not heating up");
     Wire.write("Not heating up");
   }
@@ -45,7 +61,7 @@ void requestEvent() {
   // Serial.println(val);
   r1 = (constRes * val) / (totalVolt - val);
   
-  temp = -332.28*r1 + 18026
+  temp = -332.28 * r1 + 18026;
 
   // Old method to calculate temp - not always accurate
   // temp = kelvinToCels((celsToKelvin(25.0)) * b / (b - celsToKelvin(25.0) * log(10000 / r1)));
@@ -66,5 +82,5 @@ void requestEvent() {
 void loop() {
   // requestEvent();
   // Reading
-  delay(500);
+  // delay(500);
 }
