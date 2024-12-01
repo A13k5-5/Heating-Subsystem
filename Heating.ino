@@ -44,8 +44,11 @@ void requestEvent() {
   val = totalVolt / 1023.0 * analogRead(analogPin);
   // Serial.println(val);
   r1 = (constRes * val) / (totalVolt - val);
-  Serial.println(r1);
-  temp = kelvinToCels((celsToKelvin(25.0)) * b / (b - celsToKelvin(25.0) * log(10000 / r1)));
+  
+  temp = -332.28*r1 + 18026
+
+  // Old method to calculate temp - not always accurate
+  // temp = kelvinToCels((celsToKelvin(25.0)) * b / (b - celsToKelvin(25.0) * log(10000 / r1)));
   Serial.println(temp);
 
   char charVal[10];
