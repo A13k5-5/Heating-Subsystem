@@ -3,15 +3,14 @@
 #include <Wire.h>
 int analogPin = A3;
 double val = 0.0; // store the read value
-double constRes = 9960.0;
+double constRes = 5750.0;
 double totalVolt = 5.0;
 double b = 4220;
 double r1, temp;
-double tempUncertainty = 0.6;
 
 // Writing const
 int transistorBase = 3;
-double targetTemp = 29;
+double targetTemp = 37;
 
 double celsToKelvin(double cels) {
   return cels + 273.15;
@@ -45,10 +44,10 @@ void requestEvent() {
   // Serial.println(val);
   r1 = (constRes * val) / (totalVolt - val);
   
-  temp = -332.28 * r1 + 18026;
+  // temp = -332.28 * r1 + 18026;
 
   // Old method to calculate temp - not always accurate
-  // temp = kelvinToCels((celsToKelvin(25.0)) * b / (b - celsToKelvin(25.0) * log(10000 / r1)));
+  temp = kelvinToCels((celsToKelvin(25.0)) * b / (b - celsToKelvin(25.0) * log(10000 / r1)));
   Serial.println(temp);
 
   char charVal[10];
