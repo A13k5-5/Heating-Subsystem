@@ -3,7 +3,7 @@
 #include <Wire.h>
 int analogPin = A3;
 double val = 0.0; // store the read value
-double constRes = 6660.0;
+double constRes = 9960.0;
 double totalVolt = 5.0;
 double b = 4220;
 double r1, temp;
@@ -25,19 +25,19 @@ void controlTemp(double curTemp, double targetTemp){
   if (curTemp < targetTemp - 0.5){
     digitalWrite(transistorBase, HIGH);
     Serial.println("Heating up");
-    Wire.write("Heating up");
+    // Wire.write("Heating up");
   } else {
     digitalWrite(transistorBase, LOW);
     Serial.println("Not heating up");
-    Wire.write("Not heating up");
+    // Wire.write("Not heating up");
   }
 }
 
 void setup() {
   Serial.begin(115200);
   pinMode(transistorBase, OUTPUT);
-  Wire.begin(SLAVE_ADDR); // join i2c bus with address #8
-  Wire.onRequest(requestEvent); // register event
+  // Wire.begin(SLAVE_ADDR); // join i2c bus with address #8
+  // Wire.onRequest(requestEvent); // register event
 }
 
 void requestEvent() {
@@ -45,7 +45,7 @@ void requestEvent() {
   // Serial.println(val);
   r1 = (constRes * val) / (totalVolt - val);
   
-  temp = -332.28*r1 + 18026
+  temp = -332.28 * r1 + 18026;
 
   // Old method to calculate temp - not always accurate
   // temp = kelvinToCels((celsToKelvin(25.0)) * b / (b - celsToKelvin(25.0) * log(10000 / r1)));
@@ -55,7 +55,7 @@ void requestEvent() {
   dtostrf(temp, 3, 2, charVal);
   charVal[5] = ';';
 
-  Wire.write(charVal); // respond with message of 6 bytes
+  // Wire.write(charVal); // respond with message of 6 bytes
 
   // Writing
   controlTemp(temp, targetTemp);
@@ -64,7 +64,7 @@ void requestEvent() {
 }
 
 void loop() {
-  // requestEvent();
+  requestEvent();
   // Reading
   delay(500);
 }
