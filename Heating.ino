@@ -2,59 +2,74 @@
 #define SLAVE_ADDR 9
 #include <Wire.h>
 int analogPin = A3;
-double val = 0.0; // store the read value
-double constRes = 5750.0;
-double totalVolt = 5.0;
-double b = 4220;
-double r1, temp;
+float val = 0.0; // store the read value
+float constRes = 9960.0;
+float totalVolt = 5.0;
+float b = 4220;
+float r1, temp;
 
 // Writing const
 int transistorBase = 3;
-double targetTemp = 37;
+float targetTemp = 35;
 
-double celsToKelvin(double cels) {
+float celsToKelvin(float cels) {
   return cels + 273.15;
 }
 
-double kelvinToCels(double kelv){
+float kelvinToCels(float kelv){
   return kelv - 273.15;
 }
 
-void controlTemp(double curTemp, double targetTemp){
+void controlTemp(float curTemp, float targetTemp){
   if (curTemp < targetTemp - 0.5){
     digitalWrite(transistorBase, HIGH);
     Serial.println("Heating up");
-    // Wire.write("Heating up");
+    Wire.write("Heating up");
   } else {
     digitalWrite(transistorBase, LOW);
     Serial.println("Not heating up");
-    // Wire.write("Not heating up");
+    Wire.write("Not heating up");
   }
 }
 
 void setup() {
   Serial.begin(115200);
   pinMode(transistorBase, OUTPUT);
-  // Wire.begin(SLAVE_ADDR); // join i2c bus with address #8
-  // Wire.onRequest(requestEvent); // register event
+  Wire.begin(SLAVE_ADDR); // join i2c bus with address #8
+  Wire.onReceive(receiveEvent);
+  Wire.onRequest(requestEvent); // register event
+}
+
+void receiveEvent(int bytes) {
+  String receivedData = ""; // Clear the buffer
+  while (Wire.available()) {
+    char c = Wire.read();
+    receivedData += c;
+  }
+  Serial.println("Data received from ESP32: " + receivedData);
+  targetTemp = receivedData.toFloat();
+
 }
 
 void requestEvent() {
   val = totalVolt / 1023.0 * analogRead(analogPin);
+  Serial.println(val);
   // Serial.println(val);
   r1 = (constRes * val) / (totalVolt - val);
   
-  // temp = -332.28 * r1 + 18026;
+  // temp = -332.28*r1 + 18026;
 
   // Old method to calculate temp - not always accurate
   temp = kelvinToCels((celsToKelvin(25.0)) * b / (b - celsToKelvin(25.0) * log(10000 / r1)));
-  Serial.println(temp);
+  // Serial.println(temp);
 
-  char charVal[10];
-  dtostrf(temp, 3, 2, charVal);
-  charVal[5] = ';';
+  char tempMsg[10];
 
-  // Wire.write(charVal); // respond with message of 6 bytes
+  // Convert float to char array
+  sprintf(tempMsg, "%f", temp);
+
+
+  Wire.write(tempMsg); // respond with message of 6 bytes
 
   // Writing
   controlTemp(temp, targetTemp);
